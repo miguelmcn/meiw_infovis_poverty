@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+
+<head>
+    <script src="https://unpkg.com/topojson@3"></script>
+
+    <script src="https://d3js.org/d3.v7.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.13.0/d3-legend.js"></script>
+</head>
+
+<body>
+    <svg class="chart" width="420" height="120"></svg>
+    <script type="module">
+
+        // DADOS 2022
+        var dataset =
+            [
+                {
+                    children: false,
+                    name: "1 adulto sem crianças",
+                    value: 24.9
+                },
+                {
+                    children: false,
+                    name: "1 adulto com menos de 65 anos, sem crianças",
+                    value: 20.7
+                },
+                {
+                    children: false,
+                    name: "1 adulto com 65 + anos, sem crianças",
+                    value: 28.2
+                },
+                {
+                    children: false,
+                    name: "2 adultos ambos c/ menos de 65 anos, sem crianças",
+                    value: 12.7
+                },
+                {
+                    children: false,
+                    name: "2 adultos, pelo menos 1 c/ 65 + anos, sem crianças",
+                    value: 15
+                },
+                {
+                    children: false,
+                    name: "Outros agregados, sem crianças",
+                    value: 11.1
+                },
+                {
+                    children: false,
+                    name: "Outros agregados, sem crianças",
+                    value: 11.1
+                },
+                {
+                    children: true,
+                    name: "1 adulto c/ pelo menos 1 criança",
+                    value: 31.2
+                },
+                {
+                    children: true,
+                    name: "2 adultos com 1 criança",
+                    value: 11.3
+                },
+                {
+                    children: true,
+                    name: "2 adultos com 2 crianças",
+                    value: 13.9
+                },
+                {
+                    children: true,
+                    name: "2 adultos com 3 + crianças",
+                    value: 23.6
+                },
+                {
+                    children: true,
+                    name: "Outros agregados, com crianças",
+                    value: 22.7
+                }
+            ];
+
+        // Set up the SVG container for the main chart
+        const width = 1600;
+        const height = 1200;
+
+        const svg = d3.select('body')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('fill', 'white');
+
+        // Set up the SVG container for the legend
+        const legendWidth = 200;
+        const legendHeight = 200;
+
+        const legendSvg = d3.select('body')
+            .append('svg')
+            .attr('width', legendWidth)
+            .attr('height', legendHeight)
+            .style('position', 'absolute')
+            .style('top', '50px')
+            .style('left', `${width + 50}px`); // Adjust the position of the legend
+
+        // Create a color scale based on the percentage values
+        const colorScale = d3.scaleSequential(d3.interpolateBlues)
+            .domain([d3.min(dataset, d => d.value), d3.max(dataset, d => d.value)])
+            .range(["ForestGreen", "orangered"]);
+
+
+        // Create a pack layout for the hierarchical data
+        const pack = d3.pack()
+            .size([width, height])
+            .padding(5);
+
+        // Create a root node for the hierarchical data
+        const root = d3.hierarchy({ children: dataset })
+            .sum(d => d.value);
+
+        // Assign positions to the nodes
+        pack(root);
+
+        // Create circles based on the hierarchical data with varying colors
+        svg.selectAll('circle')
+            .data(root.descendants())
+            .enter()
+            .append('circle')
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y)
+            .attr('r', d => d.r)
+            .attr('fill', d => colorScale(d.data.value));
+
+        // Add labels to both parent and child nodes
+        svg.selectAll('text')
+            .data(root.descendants())
+            .enter()
+            .append('text')
+            .attr('x', d => d.x)
+            .attr('y', d => d.y)
+            .attr('text-anchor', 'middle')
+            .attr('dy', '0.3em') // Adjust the vertical position of the label
+            .style('font-size', '10px')
+            .style('fill', 'white')
+            .style('line-break', 'loose')
+            .text(d => d.data.name);
+
+        // Create legend based on the color scale
+        const legend = legendSvg.append('g')
+            .attr('transform', 'translate(20, 20)');
+
+        const legendColorScale = d3.scaleLinear()
+            .domain([0, 1])
+            .range([0, legendHeight - 40]);
+
+        legend.selectAll('rect')
+            .data(d3.range(0, 1, 0.01)) // Adjust the step based on your color scale
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', d => legendHeight - 40 - legendColorScale(d))
+            .attr('width', 20)
+            .attr('height', legendColorScale(0.01))
+            .attr('fill', d => colorScale(d3.max(dataset, d => d.value) * d));
+
+        // Add legend labels
+        legend.append('text')
+            .attr('x', 25)
+            .attr('y', 10)
+            .style('font-size', '12px')
+            .text('Legend');
+
+        legend.append('text')
+            .attr('x', 25)
+            .attr('y', legendHeight - 10)
+            .style('font-size', '10px')
+            .text('0%');
+
+        legend.append('text')
+            .attr('x', 25)
+            .attr('y', 10)
+            .style('font-size', '10px')
+            .text('100%');
+
+    </script>
+
+</body>
+
+</html>

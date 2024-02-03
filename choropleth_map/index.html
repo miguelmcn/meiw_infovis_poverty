@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+
+<head>
+    <script src="https://unpkg.com/topojson@3"></script>
+
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.13.0/d3-legend.js"></script>
+</head>
+
+<body>
+
+    <script type="module">
+        import map_data from "http://localhost:5500/portugal.json" assert { type: "json" };
+
+        // DADOS 2022
+        var data = {
+            // NORTE
+            "Braga": 32.5,
+            "Bragança": 32.5,
+            "Porto": 32.5,
+            "Viana do Castelo": 32.5,
+            "Vila Real": 32.5,
+
+            // CENTRO
+            "Aveiro": 32.7,
+            "Castelo Branco": 32.7,
+            "Coimbra": 32.7,
+            "Guarda": 32.7,
+            "Leiria": 32.7,
+            "Viseu": 32.7,
+
+            // AM LISBOA
+            "Lisboa": 34.9,
+            "Santarém": 34.9,
+            "Setúbal": 34.9,
+
+            // ALENTEJO
+            "Beja": 30,
+            "Évora": 30,
+            "Portalegre": 30,
+
+            // ALGARVE 
+            "Faro": 34.4,
+
+            // AÇORES
+            "Azores": 36,
+
+            // MADEIRA
+            "Madeira": 32.7
+        }
+
+        d3.json("http://localhost:5500/portugal.json", function (mapa) {
+            drawMap(mapa, data);
+            addSubtitles();
+        });
+
+
+        var width = 3200;
+        var heigh = 2400;
+
+        // var projection = d3.geoMercator().center([-8, 39.5]).scale(6000);
+        var projection = d3.geoMercator().center([-27, 40.5]).scale(3500);
+        var path = d3.geoPath().projection(projection);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", heigh);
+
+
+        var color = d3.scaleLinear()
+            // .domain([0, 30])
+            .domain([d3.min(Object.values(data)), d3.max(Object.values(data))])
+            .range(["ForestGreen", "orangered"]);
+
+        function drawMap(mapa, data) {
+            svg.selectAll("path")
+                .data(topojson.feature(mapa, mapa.objects.portugal).features)
+                .enter().append("path")
+                .attr("d", path)
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 1)
+                .attr("fill", function (d) {
+                    var region = d.properties.name; // Nome da região no seu conjunto de data
+                    return color(data[region]);
+                });
+
+            // Add labels
+            svg.selectAll("text")
+                .data(topojson.feature(mapa, mapa.objects.portugal).features)
+                .enter().append("text")
+                .attr("transform", function (d) {
+                    return "translate(" + path.centroid(d) + ")";
+                })
+                .attr("dy", ".35em")
+                .text(function (d) {
+                    return d.properties.name;
+                })
+                .style("text-anchor", "middle")
+                .style("font-family", "Arial")
+                .style("font-size", "10px")
+                .style("fill", "#eee");
+
+        }
+
+        function addSubtitles() {
+            var svg = d3.select("svg");
+
+            var legenda = svg.append("g")
+                .attr("class", "legenda")
+                .attr("transform", "translate(20,20)");
+
+            legenda.append("text")
+                .attr("x", 0)
+                .attr("y", -15)
+                .attr("dy", "0.71em")
+                .style("font-size", "14px")
+                .style("font-family", "Arial")
+                .text("Risco de Pobreza por zona do país (%)");
+
+            var legendRectSize = 18;
+            var legendSpacing = 4;
+
+            var legendColor = d3.legendColor()
+                .scale(color)
+                .shape("rect")
+                .shapeWidth(legendRectSize)
+                .shapePadding(legendSpacing)
+                .orient("vertical");
+
+            legenda.call(legendColor);
+        }
+
+
+    </script>
+
+</body>
+
+</html>

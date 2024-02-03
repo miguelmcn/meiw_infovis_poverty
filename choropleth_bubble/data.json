@@ -1,0 +1,62 @@
+[
+    {
+        "children": false,
+        "name": "1 adulto sem crianças",
+        "value": 24.9
+    },
+    {
+        "children": false,
+        "name": "1 adulto com menos de 65 anos, sem crianças",
+        "value": 20.7
+    },
+    {
+        "children": false,
+        "name": "1 adulto com 65 + anos, sem crianças",
+        "value": 28.2
+    },
+    {
+        "children": false,
+        "name": "2 adultos ambos c/ menos de 65 anos, sem crianças",
+        "value": 12.7
+    },
+    {
+        "children": false,
+        "name": "2 adultos, pelo menos 1 c/ 65 + anos, sem crianças",
+        "value": 15
+    },
+    {
+        "children": false,
+        "name": "Outros agregados, sem crianças",
+        "value": 11.1
+    },
+    {
+        "children": false,
+        "name": "Outros agregados, sem crianças",
+        "value": 11.1
+    },
+    {
+        "children": true,
+        "name": "1 adulto c/ pelo menos 1 criança",
+        "value": 31.2
+    },
+    {
+        "children": true,
+        "name": "2 adultos com 1 criança",
+        "value": 11.3
+    },
+    {
+        "children": true,
+        "name": "2 adultos com 2 crianças",
+        "value": 13.9
+    },
+    {
+        "children": true,
+        "name": "2 adultos com 3 + crianças",
+        "value": 23.6
+    },
+    {
+        "children": true,
+        "name": "Outros agregados, com crianças",
+        "value": 22.7
+    }
+]
